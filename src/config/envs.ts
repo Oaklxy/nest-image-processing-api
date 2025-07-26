@@ -9,7 +9,8 @@ interface EnvVars {
   DATABASE_PASSWORD: string;
   DATABASE_USER: string;
 
-  JWT_SECRET: string;
+  JWT_SECRET_KEY: string;
+  JWT_EXPIRES_IN: string;
 };
 
 export const envValidationsSchema = joi.object<EnvVars>({
@@ -21,6 +22,7 @@ export const envValidationsSchema = joi.object<EnvVars>({
   DATABASE_PASSWORD: joi.string().required(),
   DATABASE_USER: joi.string().required(),
 
-  JWT_SECRET: joi.string().required(),
+  JWT_SECRET_KEY: joi.string().required(),
+  JWT_EXPIRES_IN: joi.string().default('24h'),
 })
   .unknown(true);
