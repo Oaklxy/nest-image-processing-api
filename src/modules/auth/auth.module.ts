@@ -18,7 +18,7 @@ import { AtStrategy, RtStrategy } from './strategies';
       useFactory: async (configService: ConfigService) => ({
         secret: configService.get<string>('JWT_SECRET_KEY'),
         signOptions: {
-          expiresIn: configService.get<string>('JWT_EXPIRES_IN', '24h'),
+          expiresIn: configService.get<string>('JWT_AT_EXPIRES_IN', '15m'),
         },
       }),
     }),
