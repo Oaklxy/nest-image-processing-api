@@ -32,7 +32,7 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     };
 
-    if (!await argon2.verify(password, user.password)) {
+    if (!await argon2.verify(user.password, password)) {
       throw new UnauthorizedException('Invalid credentials');
     };
 
