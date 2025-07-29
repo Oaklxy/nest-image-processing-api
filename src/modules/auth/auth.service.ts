@@ -10,6 +10,7 @@ import { SignInDto, SignUpDto } from './dto';
 import { PrismaService } from '../../prisma/prisma.service';
 import { IJWTPayload } from './interfaces';
 import { IApiResponse } from '../../common/interfaces';
+import { UsersService } from '../users/user.service';
 
 @Injectable()
 export class AuthService {
@@ -17,6 +18,7 @@ export class AuthService {
     private readonly configService: ConfigService,
     private readonly jwtService: JwtService,
     private readonly prismaService: PrismaService,
+    private readonly usersService: UsersService,
   ) { };
 
   public async signIn(signInDto: SignInDto, res: Response) {
@@ -45,7 +47,7 @@ export class AuthService {
 
     this.saveTokensInCookies(tokens, res);
 
-    //TODO: UPDATE THE USER REFRESH TOKEN IN DB
+    await this.usersService.update(user.id, { refresh_token: tokens.refresh_token });
 
     return {
       ok: true,
@@ -105,7 +107,6 @@ export class AuthService {
     };
   };
 
-  //TODO: ADD AN INTERFACE FOR THE TOKENS TYPE
   private saveTokensInCookies(tokens: { accessToken: string, refreshToken: string }, res: Response): void {
     const accessTokenExpiresIn: Date = new Date(
       Date.now() + parseInt(this.configService.get<string>('JWT_AT_EXPIRES_IN')!),
