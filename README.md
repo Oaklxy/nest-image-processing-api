@@ -50,7 +50,14 @@ Here is the list of endpoints for this project:
 
 - `POST /auth/signup` - Create an account
 - `POST /auth/signin` - Sign in and receive JWT tokens
-- `TODO`
+- `GET /auth/signout` - Sign out
+
+### 👥 Users Endpoints
+
+- `GET /users?page=1&limit=10` - Find all users (with pagination)
+- `GET /users/:id` - Find one user by id
+- `PATCH /users/:id` - Update user
+- `DELETE /users/:id` - Delete or change the is_active status of the user
 
 ### 🖼️ Image Management Endpoints
 
