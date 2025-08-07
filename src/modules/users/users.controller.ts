@@ -1,9 +1,11 @@
 import { Body, Controller, Delete, Get, Param, ParseUUIDPipe, Patch, Query } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 
 import { UsersService } from './user.service';
 import { UpdateUserDto } from './dto';
 import { PaginationDto } from '../../common';
 
+@ApiTags('Users')
 @Controller('users')
 export class UsersController {
   public constructor(
