@@ -21,6 +21,25 @@ model User {
   refresh_token String? @unique
   is_active Boolean @default(true)
 
+  images Image[]
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+}
+
+model Image {
+  id String @id @default(uuid())
+  url String @unique
+  format String
+  width Int
+  height Int
+  is_active Boolean @default(true)
+
+  user_id String
+
+  user User @relation(fields: [user_id], references: [id])
+
+
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
 }
