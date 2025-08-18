@@ -15,25 +15,18 @@ export class RtStrategy extends PassportStrategy(Strategy, 'jwt-refresh') {
     private readonly configService: ConfigService,
   ) {
     super({
-      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      jwtFromRequest: ExtractJwt.fromExtractors([
+        (req: Request) => req.cookies?.Refresh,
+      ]),
       secretOrKey: configService.get<string>('JWT_SECRET_KEY')!,
       passReqToCallback: true,
     });
   };
 
   public async validate(req: Request, payload: IJWTPayload): Promise<any> {
-    const { id } = payload;
+    const rT: string = req.cookies?.Refresh;
 
-    const user: UserModel | null = await this.authService.validateUser(id);
-
-    const rT: string | undefined = req
-      ?.get('authorization')
-      ?.replace('Bearer', '')
-      .trim();
-
-    if (!rT) {
-      throw new ForbiddenException('Invalid refresh token');
-    };
+    const user = await this.authService.validateUserRefreshToken(payload.id, rT);
 
     return {
       payload,
