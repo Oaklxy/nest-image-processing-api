@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { User as UserModel } from '@prisma/client';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
@@ -69,7 +69,7 @@ export class AuthService {
           password: hashedPassword,
         },
       });
-      
+
       const payload: IJWTPayload = {
         id: newUser.id,
         email: newUser.email,
@@ -145,9 +145,27 @@ export class AuthService {
     return user;
   };
 
+  public async validateUserRefreshToken(id: string, refreshToken: string) {
+    try {
+      const user = await this.usersService.findOne(id);
+
+      const userRefreshToken = user.data.user.refresh_token;
+
+      const validRefreshToken = await argon2.verify(userRefreshToken, refreshToken);
+
+      if (!validRefreshToken) {
+        throw new ForbiddenException('Invalid refresh token');
+      };
+
+      return user;
+    } catch (error) {
+      throw new ForbiddenException('Invalid refresh token');
+    };
+  };
+
   private async generateTokens(payload: IJWTPayload): Promise<any> {
-    const accessToken: string = await this.jwtService.signAsync(payload, { expiresIn: '15m', secret: this.configService.get<string>('JWT_SECRET_KEY')});
-    const refreshToken: string = await this.jwtService.signAsync(payload, { expiresIn: '24h', secret: this.configService.get<string>('JWT_SECRET_KEY')});
+    const accessToken: string = await this.jwtService.signAsync(payload, { expiresIn: '15m', secret: this.configService.get<string>('JWT_SECRET_KEY') });
+    const refreshToken: string = await this.jwtService.signAsync(payload, { expiresIn: '24h', secret: this.configService.get<string>('JWT_SECRET_KEY') });
 
     return {
       access_token: accessToken,
