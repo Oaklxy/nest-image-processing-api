@@ -33,6 +33,8 @@ model Image {
   format String
   width Int
   height Int
+  size Int
+  buffer Bytes
   is_active Boolean @default(true)
 
   user_id String
