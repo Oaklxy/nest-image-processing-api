@@ -44,24 +44,31 @@ Principal features include:
 
 ## 🌐 Endpoints
 
-Here is the list of endpoints for this project:
+List of endpoints:
 
-### 🔐 Authentication Endpoints
+### 📄 Documentation:
+
+- `{{url}}/api` in a browser.
+
+### 🔐 Authentication:
 
 - `POST /auth/signup` - Create an account
 - `POST /auth/signin` - Sign in and receive JWT tokens
 - `GET /auth/signout` - Sign out
 
-### 👥 Users Endpoints
+### 👥 Users:
 
 - `GET /users?page=1&limit=10` - Find all users (with pagination)
 - `GET /users/:id` - Find one user by id
 - `PATCH /users/:id` - Update user
 - `DELETE /users/:id` - Delete or change the is_active status of the user
 
-### 🖼️ Image Management Endpoints
+### 🖼️ Image Management:
 
-*TODO*
+- `GET /images?page=1&limit=10` - Find all images (with pagination)
+- `GET /images/:id` - Find one image by id
+- `POST /images/upload` - Upload an image
+- `PATCH /images/transform/:id` - Transform an image by id
 
 ----
 
