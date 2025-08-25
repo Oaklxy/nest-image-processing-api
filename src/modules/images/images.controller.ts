@@ -1,8 +1,8 @@
-import { Controller, Get, Param, ParseUUIDPipe, Post, Query, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Get, Param, ParseUUIDPipe, Patch, Post, Query, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 
 import { ImagesService } from './images.service';
-import { UploadImagesDto } from './dto';
+import { TransformImagesDto, UploadImagesDto } from './dto';
 import { PaginationDto } from '../../common';
 import { FileInterceptor } from '@nestjs/platform-express';
 
@@ -34,5 +34,13 @@ export class ImagesController {
     uploadImagesDto: UploadImagesDto
   ) {
     return this.imagesService.upload(uploadImagesDto, image);
+  };
+
+  @Patch('transform/:id')
+  public transform(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() transformImagesDto: TransformImagesDto,
+  ) {
+    return this.imagesService.transform(id, transformImagesDto);
   };
 };
