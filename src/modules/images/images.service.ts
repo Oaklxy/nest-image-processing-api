@@ -61,11 +61,13 @@ export class ImagesService {
 
     const newImage: ImageModel = await this.prismaService.image.create({
       data: {
-        width: metadata.width || 0,
+        buffer,
         height: metadata.height || 0,
+        width: metadata.width || 0,
         format: metadata.format,
+        size,
         url: originalname,
-        user_id: 'test',
+        user_id: '74511a6a-f66c-4a55-af7b-bda95e64acc1',
       },
     });
 
@@ -78,7 +80,41 @@ export class ImagesService {
     };
   };
 
-  public transform(transformImagesDto: TransformImagesDto) {
+  public async transform(id: string, transformImagesDto: TransformImagesDto) {
+    const transformations = transformImagesDto?.transformations;
 
+    let savedEditedImage: ImageModel | undefined;
+    const image: ImageModel = (await this.findOne(id))?.data?.image;
+
+    if (transformations?.resize) {
+      const { height, width } = transformations.resize;
+
+      const editedImage = sharp(image.buffer)
+        .resize({
+          height,
+          width,
+        });
+
+      const outputBuffer = await editedImage.toBuffer();
+
+      savedEditedImage = await this.prismaService.image.update({
+        where: {
+          id,
+        },
+        data: {
+          height,
+          width,
+          buffer: outputBuffer,
+        },
+      });
+    };
+
+    return {
+      ok: true,
+      message: 'Image transformed successfully',
+      data: {
+        image: savedEditedImage,
+      },
+    };
   };
 };
