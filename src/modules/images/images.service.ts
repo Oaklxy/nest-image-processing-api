@@ -152,6 +152,24 @@ export class ImagesService {
       });
     };
 
+    if (transformations?.format) {
+      const { format } = transformations;
+
+      const editedImage = sharp(image.buffer)
+        .toFormat(format as keyof sharp.FormatEnum || 'jpeg');
+
+      const outputBuffer = await editedImage.toBuffer();
+
+      savedEditedImage = await this.prismaService.image.update({
+        where: {
+          id,
+        },
+        data: {
+          buffer: outputBuffer,
+        },
+      });
+    };
+
     return {
       ok: true,
       message: 'Image transformed successfully',
