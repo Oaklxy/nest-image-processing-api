@@ -109,6 +109,31 @@ export class ImagesService {
       });
     };
 
+    if (transformations?.crop) {
+      const { height, width, top, left } = transformations.crop;
+
+      const editedImage = sharp(image.buffer)
+        .extract({
+          height: height || image.height,
+          width: width || image.width,
+          top: top || 0,
+          left: left || 0,
+        });
+
+      const outputBuffer = await editedImage.toBuffer();
+
+      savedEditedImage = await this.prismaService.image.update({
+        where: {
+          id,
+        },
+        data: {
+          height: height || image.height,
+          width: width || image.width,
+          buffer: outputBuffer,
+        },
+      });
+    };
+
     return {
       ok: true,
       message: 'Image transformed successfully',
