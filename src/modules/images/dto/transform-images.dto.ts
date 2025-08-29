@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsNumber, IsOptional, ValidateNested } from 'class-validator';
+import { IsNumber, IsOptional, IsString, ValidateNested } from 'class-validator';
 
 class ResizeDto {
   @ApiProperty({
@@ -82,6 +82,10 @@ class TransformationsDto {
   @ValidateNested()
   @Type(() => RotateDto)
   public rotate?: RotateDto;
+
+  @IsString()
+  @IsOptional()
+  public format?: string;
 };
 
 export class TransformImagesDto {
