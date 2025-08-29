@@ -134,6 +134,24 @@ export class ImagesService {
       });
     };
 
+    if (transformations?.rotate) {
+      const { angle } = transformations.rotate;
+
+      const editedImage = sharp(image.buffer)
+        .rotate(angle || 0);
+
+      const outputBuffer = await editedImage.toBuffer();
+
+      savedEditedImage = await this.prismaService.image.update({
+        where: {
+          id,
+        },
+        data: {
+          buffer: outputBuffer,
+        },
+      });
+    };
+
     return {
       ok: true,
       message: 'Image transformed successfully',
