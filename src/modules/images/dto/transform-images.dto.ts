@@ -40,6 +40,31 @@ class CropDto {
   @IsNumber()
   @IsOptional()
   public width?: number;
+
+  @ApiProperty({
+    description: 'The new desired top for the image',
+    type: Number,
+    required: false,
+  })
+  public top?: number;
+
+  @ApiProperty({
+    description: 'The new desired left for the image',
+    type: Number,
+    required: false,
+  })
+  public left?: number;
+};
+
+export class RotateDto {
+  @ApiProperty({
+    description: 'The angle to rotate the image',
+    type: Number,
+    required: false,
+  })
+  @IsNumber()
+  @IsOptional()
+  public angle?: number;
 };
 
 class TransformationsDto {
@@ -52,6 +77,11 @@ class TransformationsDto {
   @ValidateNested()
   @Type(() => ResizeDto)
   public resize?: ResizeDto;
+
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => RotateDto)
+  public rotate?: RotateDto;
 };
 
 export class TransformImagesDto {
