@@ -107,7 +107,7 @@ export class AuthService {
     };
   };
 
-  private saveTokensInCookies(tokens: { accessToken: string, refreshToken: string }, res: Response): void {
+  private saveTokensInCookies(tokens: { access_token: string, refresh_token: string }, res: Response): void {
     const accessTokenExpiresIn: Date = new Date(
       Date.now() + parseInt(this.configService.get<string>('JWT_AT_EXPIRES_IN')!),
     );
@@ -116,14 +116,14 @@ export class AuthService {
       Date.now() + parseInt(this.configService.get<string>('JWT_RT_EXPIRES_IN')!),
     );
 
-    res.cookie('Authentication', tokens.accessToken, {
+    res.cookie('Authentication', tokens.access_token, {
       httpOnly: true,
       expires: accessTokenExpiresIn,
       sameSite: 'strict',
       secure: this.configService.get<string>('NODE_ENV') === 'production',
     });
 
-    res.cookie('Refresh', tokens.refreshToken, {
+    res.cookie('Refresh', tokens.refresh_token, {
       httpOnly: true,
       expires: refreshTokenExpiresIn,
       sameSite: 'strict',
