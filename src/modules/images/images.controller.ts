@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, ParseUUIDPipe, Patch, Post, Query, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Get, Param, ParseUUIDPipe, Patch, Post, Query, Req, UnauthorizedException, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 
@@ -6,6 +6,9 @@ import { ImagesService } from './images.service';
 import { TransformImagesDto, UploadImagesDto } from './dto';
 import { PaginationDto } from '../../common';
 import { JwtAuthGuard } from '../auth/guards';
+import { GetUser } from '../auth/decorators';
+import { Request } from 'express';
+import { IJWTPayload } from '../auth/interfaces';
 
 @ApiTags('Images')
 @Controller('images')
@@ -34,10 +37,12 @@ export class ImagesController {
   @Post('upload')
   @UseInterceptors(FileInterceptor('image'))
   public upload(
+    @Req() req: Request,
+    @GetUser() user: IJWTPayload,
     @UploadedFile() image: Express.Multer.File,
-    uploadImagesDto: UploadImagesDto
+    @Body() uploadImagesDto: UploadImagesDto,
   ) {
-    return this.imagesService.upload(uploadImagesDto, image);
+    return this.imagesService.upload(user, uploadImagesDto, image);
   };
 
   @UseGuards(JwtAuthGuard)
