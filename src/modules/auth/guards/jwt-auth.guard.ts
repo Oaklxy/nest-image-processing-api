@@ -3,6 +3,8 @@ import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
 
+import { IJWTPayload } from '../interfaces';
+
 @Injectable()
 export class JwtAuthGuard implements CanActivate {
   public constructor(
@@ -19,7 +21,7 @@ export class JwtAuthGuard implements CanActivate {
     };
 
     try {
-      const payload = await this.jwtService.verifyAsync(
+      const payload: IJWTPayload = await this.jwtService.verifyAsync(
         token,
         {
           secret: this.configService.get<string>('JWT_SECRET_KEY'),
