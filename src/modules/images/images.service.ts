@@ -52,7 +52,7 @@ export class ImagesService {
     };
   };
 
-  public async upload(uploadImagesDto: UploadImagesDto, image: Express.Multer.File) {
+  public async upload(user, uploadImagesDto: UploadImagesDto, image: Express.Multer.File) {
     const { originalname, encoding, mimetype, buffer, size } = image;
     
     const metadata = await sharp(buffer).metadata();
@@ -67,7 +67,7 @@ export class ImagesService {
         format: metadata.format,
         size,
         url: originalname,
-        user_id: '74511a6a-f66c-4a55-af7b-bda95e64acc1',
+        user_id: user.id,
       },
     });
 
