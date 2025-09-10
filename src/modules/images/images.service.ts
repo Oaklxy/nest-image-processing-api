@@ -19,6 +19,9 @@ export class ImagesService {
     const images = await this.prismaService.image.findMany({
       skip: ((page - 1) * limit),
       take: limit,
+      omit: {
+        buffer: true,
+      },
     });
 
     return {
