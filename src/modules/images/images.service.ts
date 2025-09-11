@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Image as ImageModel } from '@prisma/client';
+import { v4 as uuidv4 } from 'uuid';
 import * as sharp from 'sharp';
 
 import { UploadImagesDto } from './dto/upload-images.dto';
@@ -57,10 +58,12 @@ export class ImagesService {
 
   public async upload(user, uploadImagesDto: UploadImagesDto, image: Express.Multer.File) {
     const { originalname, encoding, mimetype, buffer, size } = image;
-    
+
     const metadata = await sharp(buffer).metadata();
 
     //TODO: Implement a service to handle image uploads
+
+    const url: string = `${originalname.replace(/\.[^/.]+$/, "").toLowerCase()}-${uuidv4()}`;
 
     const newImage: ImageModel = await this.prismaService.image.create({
       data: {
@@ -69,7 +72,7 @@ export class ImagesService {
         width: metadata.width || 0,
         format: metadata.format,
         size,
-        url: originalname,
+        url,
         user_id: user.id,
       },
     });
@@ -86,92 +89,59 @@ export class ImagesService {
   public async transform(id: string, transformImagesDto: TransformImagesDto) {
     const transformations = transformImagesDto?.transformations;
 
-    let savedEditedImage: ImageModel | undefined;
     const image: ImageModel = (await this.findOne(id))?.data?.image;
+
+    let transformedImage = sharp(image.buffer);
 
     if (transformations?.resize) {
       const { height, width } = transformations.resize;
 
-      const editedImage = sharp(image.buffer)
-        .resize({
-          height,
-          width,
-        });
-
-      const outputBuffer = await editedImage.toBuffer();
-
-      savedEditedImage = await this.prismaService.image.update({
-        where: {
-          id,
-        },
-        data: {
-          height,
-          width,
-          buffer: outputBuffer,
-        },
+      transformedImage.resize({
+        height,
+        width,
       });
     };
 
     if (transformations?.crop) {
       const { height, width, top, left } = transformations.crop;
 
-      const editedImage = sharp(image.buffer)
-        .extract({
-          height: height || image.height,
-          width: width || image.width,
-          top: top || 0,
-          left: left || 0,
-        });
-
-      const outputBuffer = await editedImage.toBuffer();
-
-      savedEditedImage = await this.prismaService.image.update({
-        where: {
-          id,
-        },
-        data: {
-          height: height || image.height,
-          width: width || image.width,
-          buffer: outputBuffer,
-        },
+      transformedImage.extract({
+        height: height || image.height,
+        width: width || image.width,
+        top: top || 0,
+        left: left || 0,
       });
     };
 
     if (transformations?.rotate) {
       const { angle } = transformations.rotate;
 
-      const editedImage = sharp(image.buffer)
-        .rotate(angle || 0);
-
-      const outputBuffer = await editedImage.toBuffer();
-
-      savedEditedImage = await this.prismaService.image.update({
-        where: {
-          id,
-        },
-        data: {
-          buffer: outputBuffer,
-        },
-      });
+      transformedImage.rotate(angle || 0);
     };
 
     if (transformations?.format) {
-      const { format } = transformations;
+      const { extension } = transformations.format;
 
-      const editedImage = sharp(image.buffer)
-        .toFormat(format as keyof sharp.FormatEnum || 'jpeg');
-
-      const outputBuffer = await editedImage.toBuffer();
-
-      savedEditedImage = await this.prismaService.image.update({
-        where: {
-          id,
-        },
-        data: {
-          buffer: outputBuffer,
-        },
-      });
+      transformedImage.toFormat(extension as keyof sharp.FormatEnum).withMetadata();
     };
+
+    const { data: outputBuffer, info } = await transformedImage.toBuffer({ resolveWithObject: true });
+
+    const savedEditedImage = await this.prismaService.image.update({
+      where: {
+        id,
+      },
+      data: {
+        buffer: outputBuffer,
+        height: info.height,
+        width: info.width,
+        format: info.format,
+        size: info.size,
+      },
+      omit: {
+        buffer: true,
+      },
+    });
 
     return {
       ok: true,
