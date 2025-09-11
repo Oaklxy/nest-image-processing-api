@@ -46,6 +46,8 @@ class CropDto {
     type: Number,
     required: false,
   })
+  @IsNumber()
+  @IsOptional()
   public top?: number;
 
   @ApiProperty({
@@ -53,6 +55,8 @@ class CropDto {
     type: Number,
     required: false,
   })
+  @IsNumber()
+  @IsOptional()
   public left?: number;
 };
 
@@ -65,6 +69,17 @@ export class RotateDto {
   @IsNumber()
   @IsOptional()
   public angle?: number;
+};
+
+export class FormatDto {
+  @ApiProperty({
+    description: 'The desired file extension/format of the image',
+    type: String,
+    required: false,
+  })
+  @IsOptional()
+  @IsString()
+  public extension?: string;
 };
 
 class TransformationsDto {
@@ -83,9 +98,10 @@ class TransformationsDto {
   @Type(() => RotateDto)
   public rotate?: RotateDto;
 
-  @IsString()
   @IsOptional()
-  public format?: string;
+  @ValidateNested()
+  @Type(() => FormatDto)
+  public format?: FormatDto;
 };
 
 export class TransformImagesDto {
