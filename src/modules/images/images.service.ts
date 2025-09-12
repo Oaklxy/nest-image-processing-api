@@ -138,9 +138,6 @@ export class ImagesService {
         format: info.format,
         size: info.size,
       },
-      omit: {
-        buffer: true,
-      },
     });
 
     return {
